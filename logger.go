@@ -9,12 +9,27 @@ type printer interface {
 }
 
 type prismLogger struct {
+    defaultTags map[string]string
     printer
 }
 
-func New(printer printer) *prismLogger {
-    return &prismLogger{
+func New(printer printer, options ...LoggerOption) *prismLogger {
+    logger := &prismLogger{
         printer: printer,
+    }
+
+    for _, option := range options {
+        option(logger)
+    }
+
+    return logger
+}
+
+type LoggerOption func(logger *prismLogger)
+
+func WithDefaultTags(defaultTags map[string]string) LoggerOption {
+    return func(logger *prismLogger) {
+        logger.defaultTags = defaultTags
     }
 }
 
@@ -26,6 +41,10 @@ type event struct {
 }
 
 func (l *prismLogger) LogEvent(title, body string, tags map[string]string) {
+    for tag, value := range l.defaultTags {
+        tags[tag] = value
+    }
+
     bytes, err := json.Marshal(&event{
         Type:  "event",
         Title: title,
@@ -48,6 +67,10 @@ type gauge struct {
 }
 
 func (l *prismLogger) LogGauge(name string, value float64, tags map[string]string) {
+    for tag, value := range l.defaultTags {
+        tags[tag] = value
+    }
+
     bytes, err := json.Marshal(&gauge{
         Type:  "gauge",
         Name:  name,
@@ -65,11 +88,15 @@ func (l *prismLogger) LogGauge(name string, value float64, tags map[string]strin
 type counter struct {
     Type  string            `json:"type"`
     Name  string            `json:"name"`
-    Delta uint           `json:"delta"`
+    Delta uint              `json:"delta"`
     Tags  map[string]string `json:"tags"`
 }
 
 func (l *prismLogger) LogCounter(name string, delta uint, tags map[string]string) {
+    for tag, value := range l.defaultTags {
+        tags[tag] = value
+    }
+
     bytes, err := json.Marshal(&counter{
         Type:  "counter",
         Name:  name,
@@ -83,4 +110,3 @@ func (l *prismLogger) LogCounter(name string, delta uint, tags map[string]string
 
     l.Printf("%s\n", bytes)
 }
-
