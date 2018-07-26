@@ -10,9 +10,9 @@ import (
 var _ = Describe("PrismClient", func() {
     It("logs events", func() {
         p := newMockPrinter()
-        prismLogger := prism.New(p, prism.WithDefaultTags(map[string]string{
+        prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
             "globalTag": "globalValue",
-        }))
+        }), prism.WithPrinter(p))
 
         prismLogger.LogEvent("title", "body", map[string]string{"tag": "tag value"})
 
@@ -31,9 +31,9 @@ var _ = Describe("PrismClient", func() {
 
     It("logs gauges", func() {
         p := newMockPrinter()
-        prismLogger := prism.New(p, prism.WithDefaultTags(map[string]string{
+        prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
             "globalTag": "globalValue",
-        }))
+        }), prism.WithPrinter(p))
 
         prismLogger.LogGauge("name", 1.5, map[string]string{"tag": "tag value"})
 
@@ -52,9 +52,9 @@ var _ = Describe("PrismClient", func() {
 
     It("logs counters", func() {
         p := newMockPrinter()
-        prismLogger := prism.New(p, prism.WithDefaultTags(map[string]string{
+        prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
             "globalTag": "globalValue",
-        }))
+        }), prism.WithPrinter(p))
 
         prismLogger.LogCounter("name", 1, map[string]string{"tag": "tag value"})
 

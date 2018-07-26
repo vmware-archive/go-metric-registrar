@@ -2,6 +2,8 @@ package prism
 
 import (
     "encoding/json"
+    "log"
+    "os"
 )
 
 type printer interface {
@@ -13,9 +15,9 @@ type prismLogger struct {
     printer
 }
 
-func New(printer printer, options ...LoggerOption) *prismLogger {
+func New(options ...LoggerOption) *prismLogger {
     logger := &prismLogger{
-        printer: printer,
+        printer: log.New(os.Stdout, "", 0),
     }
 
     for _, option := range options {
@@ -32,6 +34,13 @@ func WithDefaultTags(defaultTags map[string]string) LoggerOption {
         logger.defaultTags = defaultTags
     }
 }
+
+func WithPrinter(loggerPrinter printer) LoggerOption {
+    return func(logger *prismLogger) {
+        logger.printer = loggerPrinter
+    }
+}
+
 
 type event struct {
     Type  string            `json:"type"`
