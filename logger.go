@@ -10,13 +10,13 @@ type printer interface {
     Printf(format string, v ...interface{})
 }
 
-type prismLogger struct {
+type PrismLogger struct {
     defaultTags map[string]string
     printer
 }
 
-func New(options ...LoggerOption) *prismLogger {
-    logger := &prismLogger{
+func New(options ...LoggerOption) *PrismLogger {
+    logger := &PrismLogger{
         printer: log.New(os.Stdout, "", 0),
     }
 
@@ -27,16 +27,16 @@ func New(options ...LoggerOption) *prismLogger {
     return logger
 }
 
-type LoggerOption func(logger *prismLogger)
+type LoggerOption func(logger *PrismLogger)
 
 func WithDefaultTags(defaultTags map[string]string) LoggerOption {
-    return func(logger *prismLogger) {
+    return func(logger *PrismLogger) {
         logger.defaultTags = defaultTags
     }
 }
 
 func WithPrinter(loggerPrinter printer) LoggerOption {
-    return func(logger *prismLogger) {
+    return func(logger *PrismLogger) {
         logger.printer = loggerPrinter
     }
 }
@@ -49,7 +49,7 @@ type event struct {
     Tags  map[string]string `json:"tags"`
 }
 
-func (l *prismLogger) LogEvent(title, body string, tags map[string]string) {
+func (l *PrismLogger) LogEvent(title, body string, tags map[string]string) {
     for tag, value := range l.defaultTags {
         tags[tag] = value
     }
@@ -75,7 +75,7 @@ type gauge struct {
     Tags  map[string]string `json:"tags"`
 }
 
-func (l *prismLogger) LogGauge(name string, value float64, tags map[string]string) {
+func (l *PrismLogger) LogGauge(name string, value float64, tags map[string]string) {
     for tag, value := range l.defaultTags {
         tags[tag] = value
     }
@@ -101,7 +101,7 @@ type counter struct {
     Tags  map[string]string `json:"tags"`
 }
 
-func (l *prismLogger) LogCounter(name string, delta uint, tags map[string]string) {
+func (l *PrismLogger) LogCounter(name string, delta uint, tags map[string]string) {
     for tag, value := range l.defaultTags {
         tags[tag] = value
     }
