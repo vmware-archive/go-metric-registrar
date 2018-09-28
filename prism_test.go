@@ -70,6 +70,41 @@ var _ = Describe("PrismClient", func() {
 			}`,
         )))
     })
+
+    Context("nil tags", func() {
+        It("logs events", func() {
+            p := newMockPrinter()
+            prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
+                "globalTag": "globalValue",
+            }), prism.WithPrinter(p))
+
+            prismLogger.LogEvent("title", "body", nil)
+
+            Expect(p.printed).To(Receive())
+        })
+
+        It("logs gauges", func() {
+            p := newMockPrinter()
+            prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
+                "globalTag": "globalValue",
+            }), prism.WithPrinter(p))
+
+            prismLogger.LogGauge("name", 1.5, nil)
+
+            Expect(p.printed).To(Receive())
+        })
+
+        It("logs counters", func() {
+            p := newMockPrinter()
+            prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
+                "globalTag": "globalValue",
+            }), prism.WithPrinter(p))
+
+            prismLogger.LogCounter("name", 1, nil)
+
+            Expect(p.printed).To(Receive())
+        })
+    })
 })
 
 func newMockPrinter() *mockPrinter {

@@ -50,15 +50,11 @@ type event struct {
 }
 
 func (l *PrismLogger) LogEvent(title, body string, tags map[string]string) {
-    for tag, value := range l.defaultTags {
-        tags[tag] = value
-    }
-
     bytes, err := json.Marshal(&event{
         Type:  "event",
         Title: title,
         Body:  body,
-        Tags:  tags,
+        Tags:  l.addDefaultTags(tags),
     })
     if err != nil {
         l.Printf("unable to marshal event json: %s\n", err)
@@ -76,15 +72,11 @@ type gauge struct {
 }
 
 func (l *PrismLogger) LogGauge(name string, value float64, tags map[string]string) {
-    for tag, value := range l.defaultTags {
-        tags[tag] = value
-    }
-
     bytes, err := json.Marshal(&gauge{
         Type:  "gauge",
         Name:  name,
         Value: value,
-        Tags:  tags,
+        Tags:  l.addDefaultTags(tags),
     })
     if err != nil {
         l.Printf("unable to marshal gauge json: %s\n", err)
@@ -102,15 +94,11 @@ type counter struct {
 }
 
 func (l *PrismLogger) LogCounter(name string, delta uint, tags map[string]string) {
-    for tag, value := range l.defaultTags {
-        tags[tag] = value
-    }
-
     bytes, err := json.Marshal(&counter{
         Type:  "counter",
         Name:  name,
         Delta: delta,
-        Tags:  tags,
+        Tags:  l.addDefaultTags(tags),
     })
     if err != nil {
         l.Printf("unable to marshal counter json: %s\n", err)
@@ -118,4 +106,16 @@ func (l *PrismLogger) LogCounter(name string, delta uint, tags map[string]string
     }
 
     l.Printf("%s\n", bytes)
+}
+
+func (l *PrismLogger) addDefaultTags(tags map[string]string) map[string]string {
+    if tags == nil {
+        tags = map[string]string{}
+    }
+
+    for tag, value := range l.defaultTags {
+        tags[tag] = value
+    }
+
+    return tags
 }
