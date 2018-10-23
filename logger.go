@@ -1,4 +1,4 @@
-package prism
+package metric_registrar
 
 import (
     "encoding/json"
@@ -10,13 +10,13 @@ type printer interface {
     Printf(format string, v ...interface{})
 }
 
-type PrismLogger struct {
+type StructuredLogger struct {
     defaultTags map[string]string
     printer
 }
 
-func New(options ...LoggerOption) *PrismLogger {
-    logger := &PrismLogger{
+func NewLogger(options ...LoggerOption) *StructuredLogger {
+    logger := &StructuredLogger{
         printer: log.New(os.Stdout, "", 0),
     }
 
@@ -27,16 +27,16 @@ func New(options ...LoggerOption) *PrismLogger {
     return logger
 }
 
-type LoggerOption func(logger *PrismLogger)
+type LoggerOption func(logger *StructuredLogger)
 
 func WithDefaultTags(defaultTags map[string]string) LoggerOption {
-    return func(logger *PrismLogger) {
+    return func(logger *StructuredLogger) {
         logger.defaultTags = defaultTags
     }
 }
 
 func WithPrinter(loggerPrinter printer) LoggerOption {
-    return func(logger *PrismLogger) {
+    return func(logger *StructuredLogger) {
         logger.printer = loggerPrinter
     }
 }
@@ -49,7 +49,7 @@ type event struct {
     Tags  map[string]string `json:"tags"`
 }
 
-func (l *PrismLogger) LogEvent(title, body string, tags map[string]string) {
+func (l *StructuredLogger) LogEvent(title, body string, tags map[string]string) {
     bytes, err := json.Marshal(&event{
         Type:  "event",
         Title: title,
@@ -71,7 +71,7 @@ type gauge struct {
     Tags  map[string]string `json:"tags"`
 }
 
-func (l *PrismLogger) LogGauge(name string, value float64, tags map[string]string) {
+func (l *StructuredLogger) LogGauge(name string, value float64, tags map[string]string) {
     bytes, err := json.Marshal(&gauge{
         Type:  "gauge",
         Name:  name,
@@ -93,7 +93,7 @@ type counter struct {
     Tags  map[string]string `json:"tags"`
 }
 
-func (l *PrismLogger) LogCounter(name string, delta uint, tags map[string]string) {
+func (l *StructuredLogger) LogCounter(name string, delta uint, tags map[string]string) {
     bytes, err := json.Marshal(&counter{
         Type:  "counter",
         Name:  name,
@@ -108,7 +108,7 @@ func (l *PrismLogger) LogCounter(name string, delta uint, tags map[string]string
     l.Printf("%s\n", bytes)
 }
 
-func (l *PrismLogger) addDefaultTags(tags map[string]string) map[string]string {
+func (l *StructuredLogger) addDefaultTags(tags map[string]string) map[string]string {
     if tags == nil {
         tags = map[string]string{}
     }

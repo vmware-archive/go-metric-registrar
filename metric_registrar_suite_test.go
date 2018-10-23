@@ -1,4 +1,4 @@
-package prism_test
+package metric_registrar_test
 
 import (
     . "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
     "testing"
 )
 
-func TestPrismClient(t *testing.T) {
+func TestMetricRegistrarClient(t *testing.T) {
     RegisterFailHandler(Fail)
-    RunSpecs(t, "PrismClient Suite")
+    RunSpecs(t, "Metric Registrar Suite")
 }

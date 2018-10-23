@@ -1,20 +1,20 @@
-package prism_test
+package metric_registrar_test
 
 import (
-    . "github.com/onsi/ginkgo"
     "fmt"
+    . "github.com/onsi/ginkgo"
     . "github.com/onsi/gomega"
-    "github.com/pivotal-cf/go-prism"
+    "github.com/pivotal-cf/go-metric-registrar"
 )
 
-var _ = Describe("PrismClient", func() {
+var _ = Describe("Metric Registrar Logger", func() {
     It("logs events", func() {
         p := newMockPrinter()
-        prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
+        registrarLogger := metric_registrar.NewLogger(metric_registrar.WithDefaultTags(map[string]string{
             "globalTag": "globalValue",
-        }), prism.WithPrinter(p))
+        }), metric_registrar.WithPrinter(p))
 
-        prismLogger.LogEvent("title", "body", map[string]string{"tag": "tag value"})
+        registrarLogger.LogEvent("title", "body", map[string]string{"tag": "tag value"})
 
         Expect(p.printed).To(Receive(MatchJSON(
             `{
@@ -31,11 +31,11 @@ var _ = Describe("PrismClient", func() {
 
     It("logs gauges", func() {
         p := newMockPrinter()
-        prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
+        registrarLogger := metric_registrar.NewLogger(metric_registrar.WithDefaultTags(map[string]string{
             "globalTag": "globalValue",
-        }), prism.WithPrinter(p))
+        }), metric_registrar.WithPrinter(p))
 
-        prismLogger.LogGauge("name", 1.5, map[string]string{"tag": "tag value"})
+        registrarLogger.LogGauge("name", 1.5, map[string]string{"tag": "tag value"})
 
         Expect(p.printed).To(Receive(MatchJSON(
             `{
@@ -52,11 +52,11 @@ var _ = Describe("PrismClient", func() {
 
     It("logs counters", func() {
         p := newMockPrinter()
-        prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
+        registrarLogger := metric_registrar.NewLogger(metric_registrar.WithDefaultTags(map[string]string{
             "globalTag": "globalValue",
-        }), prism.WithPrinter(p))
+        }), metric_registrar.WithPrinter(p))
 
-        prismLogger.LogCounter("name", 1, map[string]string{"tag": "tag value"})
+        registrarLogger.LogCounter("name", 1, map[string]string{"tag": "tag value"})
 
         Expect(p.printed).To(Receive(MatchJSON(
             `{
@@ -74,33 +74,33 @@ var _ = Describe("PrismClient", func() {
     Context("nil tags", func() {
         It("logs events", func() {
             p := newMockPrinter()
-            prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
+            registrarLogger := metric_registrar.NewLogger(metric_registrar.WithDefaultTags(map[string]string{
                 "globalTag": "globalValue",
-            }), prism.WithPrinter(p))
+            }), metric_registrar.WithPrinter(p))
 
-            prismLogger.LogEvent("title", "body", nil)
+            registrarLogger.LogEvent("title", "body", nil)
 
             Expect(p.printed).To(Receive())
         })
 
         It("logs gauges", func() {
             p := newMockPrinter()
-            prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
+            registrarLogger := metric_registrar.NewLogger(metric_registrar.WithDefaultTags(map[string]string{
                 "globalTag": "globalValue",
-            }), prism.WithPrinter(p))
+            }), metric_registrar.WithPrinter(p))
 
-            prismLogger.LogGauge("name", 1.5, nil)
+            registrarLogger.LogGauge("name", 1.5, nil)
 
             Expect(p.printed).To(Receive())
         })
 
         It("logs counters", func() {
             p := newMockPrinter()
-            prismLogger := prism.New(prism.WithDefaultTags(map[string]string{
+            registrarLogger := metric_registrar.NewLogger(metric_registrar.WithDefaultTags(map[string]string{
                 "globalTag": "globalValue",
-            }), prism.WithPrinter(p))
+            }), metric_registrar.WithPrinter(p))
 
-            prismLogger.LogCounter("name", 1, nil)
+            registrarLogger.LogCounter("name", 1, nil)
 
             Expect(p.printed).To(Receive())
         })
